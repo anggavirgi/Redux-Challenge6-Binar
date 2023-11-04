@@ -1,13 +1,17 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { useDataQueryPopular } from "../../services/GetPopular";
+import { getMoviePopular } from "../../redux/actions/getPopular";
 
 export const ListMoviesPopular = () => {
   const navigate = useNavigate();
 
-  const { data: fetchPopular } = useDataQueryPopular();
+  const dispatch = useDispatch();
+  const moviePopular = useSelector((state) => state.popular.popular);
 
-  const popular = fetchPopular?.data || [];
+  useEffect(() => {
+    dispatch(getMoviePopular());
+  }, []);
 
   const detailPage = (id) => {
     navigate("/detail", {
@@ -18,7 +22,7 @@ export const ListMoviesPopular = () => {
   };
 
   const renderPopular = () => {
-    return popular.slice(10, 20).map((value, index) => {
+    return moviePopular.popular?.slice(10, 20).map((value, index) => {
       return (
         <div
           key={index}

@@ -1,31 +1,39 @@
 import React, { useEffect, useState } from "react";
 import sideimage from "../assets/img/side-login.jpg";
 import { useNavigate } from "react-router-dom";
-import { useLogin } from "../services/auth/LoginUser";
 import { useGoogleLogin } from "@react-oauth/google";
 import { useDataGoogle } from "../services/auth/GoogleAuth";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { CookieStorage, CookiesKeys } from "../utils/cookies";
+import { postLoginUser } from "../redux/actions/postLogin";
+import { useDispatch } from "react-redux";
 
 export const Login = () => {
   const navigate = useNavigate();
-
-  const token = CookieStorage.get(CookiesKeys.AuthToken);
-  if (token) {
-    window.location.href = "/home";
-  }
+  const dispatch = useDispatch();
 
   const [getEmail, setEmail] = useState("");
   const [getPassword, setPassword] = useState("");
-
-  const { mutate: postLogin, data: errMsg, status } = useLogin();
+  const [getErrMsg, setErrMsg] = useState("");
 
   const handleLogin = () => {
-    postLogin({
-      email: getEmail,
-      password: getPassword,
-    });
+    dispatch(
+      postLoginUser({
+        email: getEmail,
+        password: getPassword,
+      })
+    )
+      .then((result) => {
+        if (result.status === 200) {
+          window.location.href = "/home"
+        }
+      })
+      .catch((err) => {
+        if (err.response.status === 400 || err.response.status === 401) {
+          setErrMsg(err.response.data.message);
+        }
+      });
   };
 
   const { mutate: postGoogleLogin } = useDataGoogle();
@@ -42,8 +50,8 @@ export const Login = () => {
   });
 
   useEffect(() => {
-    if (errMsg) {
-      toast.error(errMsg, {
+    if (getErrMsg) {
+      toast.error(getErrMsg, {
         position: "top-right",
         autoClose: 3500,
         hideProgressBar: false,
@@ -54,7 +62,7 @@ export const Login = () => {
         theme: "light",
       });
     }
-  }, [status === "success"]);
+  }, [getErrMsg]);
 
   const getToken = CookieStorage.get(CookiesKeys.RegisterToken);
   useEffect(() => {
@@ -75,7 +83,7 @@ export const Login = () => {
       CookieStorage.remove(CookiesKeys.RegisterToken);
     }, 3600);
   }, [getToken]);
-  
+
   return (
     <div className="w-[100vw] h-[100vh] imglogin bg-cover">
       <div className="fixed">

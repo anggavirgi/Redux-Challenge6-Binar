@@ -8,12 +8,20 @@ import { NowPlaying } from "../pages/NowPlaying";
 import { Popular } from "../pages/Popular";
 import { Login } from "../pages/Login";
 import { Register } from "../pages/Register";
+import TokenProtected from "../components/protected/TokenProtected";
 
 export const RoutesList = () => {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/home" element={<Home />} />
+        <Route
+          path="/home"
+          element={
+            <TokenProtected>
+              <Home />
+            </TokenProtected>
+          }
+        />
 
         <Route path="/" element={<Login />} />
         <Route path="/login" element={<Login />} />

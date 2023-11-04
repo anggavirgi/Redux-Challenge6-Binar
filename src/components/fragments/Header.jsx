@@ -4,9 +4,12 @@ import { useNavigate } from "react-router-dom";
 import { CookieStorage, CookiesKeys } from "../../utils/cookies";
 import { useDataMe } from "../../services/GetMe";
 import ava from "../../assets/img/ava.jpg";
+import { useDispatch } from "react-redux";
+import { setLoggedIn, setToken} from "../../redux/reducers/auth/loginReducer";
 
 export const Header = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const handleSearch = (keyword) => {
     navigate("/search", {
@@ -23,6 +26,12 @@ export const Header = () => {
     CookieStorage.remove(CookiesKeys.AuthToken);
     window.location.href = "/";
   };
+
+  if(CookieStorage.get(CookiesKeys.AuthToken)){
+    dispatch(setToken(CookieStorage.get(CookiesKeys.AuthToken)))
+    dispatch(setLoggedIn("true"));
+    // dispatch(setUser(input));
+  }
 
   return (
     <div className="flex justify-between items-center px-14 py-7 gap-3 bg-main text-white">

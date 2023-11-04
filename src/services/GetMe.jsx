@@ -10,9 +10,9 @@ const fetchDataMe = async () => {
       return resultMe;
     })
     .catch((err) => {
-      if (err) {
-        window.location.href = "/";
-      }
+      // if (err) {
+      //   window.location.href = "/";
+      // }
     });
 };
 

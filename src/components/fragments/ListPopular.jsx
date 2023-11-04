@@ -1,32 +1,33 @@
-import React, { useState } from "react";
+import React, { useEffect } from "react";
 import { Pagination } from "../elements/Pagination";
-import { useDataQueryPopular } from "../../services/GetPopular";
 import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { getMoviePopular } from "../../redux/actions/getPopular";
 
 export const ListPopular = () => {
-  const navigate = useNavigate()
-  const [pagePopular, setPagePopular] = useState(1);
+  const navigate = useNavigate();
 
-  const { data: fetchPopular } = useDataQueryPopular({
-    page: pagePopular,
-  });
+  const dispatch = useDispatch();
+  const moviePopular = useSelector((state) => state.popular.popular);
 
-  const popular = fetchPopular?.data || [];
+  useEffect(() => {
+    dispatch(getMoviePopular());
+  }, []);
 
   const handlePage = (newPage) => {
-    setPagePopular(newPage)
-  }
+    dispatch(getMoviePopular({ page: newPage }));
+  };
 
   const detailPage = (id) => {
     navigate("/detail", {
       state: {
-        movie_id: id
-      }
-    })
-  }
+        movie_id: id,
+      },
+    });
+  };
 
   const renderPopular = () => {
-    return popular.map((value, index) => {
+    return moviePopular.popular?.map((value, index) => {
       return (
         <div
           key={index}
@@ -63,8 +64,6 @@ export const ListPopular = () => {
   };
   return (
     <div className="px-14 pt-6 bg-main text-white">
-      {/* <div className="font-bold text-3xl text-center">== SEARCH NOT FOUND ==</div> */}
-
       <div className="mb-6 font-semibold text-xl">Popular</div>
 
       <div className="grid grid-cols-5 gap-8">{renderPopular()}</div>
