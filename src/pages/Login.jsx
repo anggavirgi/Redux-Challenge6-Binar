@@ -2,11 +2,11 @@ import React, { useEffect, useState } from "react";
 import sideimage from "../assets/img/side-login.jpg";
 import { useNavigate } from "react-router-dom";
 import { useGoogleLogin } from "@react-oauth/google";
-import { useDataGoogle } from "../services/auth/GoogleAuth";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { postLoginUser } from "../redux/actions/postLogin";
 import { useDispatch, useSelector } from "react-redux";
+import { postAuthGoogle } from "../redux/actions/postGoogle";
 
 export const Login = () => {
   const navigate = useNavigate();
@@ -35,12 +35,18 @@ export const Login = () => {
       });
   };
 
-  const { mutate: postGoogleLogin } = useDataGoogle();
-
   const handleGoogleLogin = useGoogleLogin({
     onSuccess: (credentialResponse) => {
-      postGoogleLogin({
-        access_token: credentialResponse.access_token,
+      dispatch(
+        postAuthGoogle({
+          access_token: credentialResponse.access_token,
+        })
+      ).then((result) => {
+        if (result.status === 200) {
+          window.location.href = "/home";
+        }
+      }).catch((err) => {
+        
       });
     },
     onError: () => {

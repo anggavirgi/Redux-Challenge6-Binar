@@ -10,6 +10,7 @@ import {
   setUser,
 } from "../../redux/reducers/auth/loginReducer";
 import { getDataMe } from "../../redux/actions/getMe";
+import { setStatus } from "../../redux/reducers/auth/googleReducer";
 
 export const Header = () => {
   const navigate = useNavigate();
@@ -31,10 +32,19 @@ export const Header = () => {
 
   const handleLogout = () => {
     CookieStorage.remove(CookiesKeys.AuthToken);
+    if (CookieStorage.get(CookiesKeys.GoogleCredentials)) {
+      CookieStorage.remove(CookiesKeys.GoogleCredentials);
+    }
     window.location.href = "/";
   };
 
-  if (CookieStorage.get(CookiesKeys.AuthToken)) {
+  if (
+    CookieStorage.get(CookiesKeys.AuthToken) &&
+    CookieStorage.get(CookiesKeys.GoogleCredentials)
+  ) {
+    dispatch(setToken(CookieStorage.get(CookiesKeys.AuthToken)));
+    dispatch(setStatus("Login Google Berhasil !"));
+  } else if (CookieStorage.get(CookiesKeys.AuthToken)) {
     dispatch(setToken(CookieStorage.get(CookiesKeys.AuthToken)));
     dispatch(setLoggedIn("true"));
     dispatch(setUser(email));

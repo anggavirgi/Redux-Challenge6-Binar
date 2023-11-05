@@ -1,6 +1,7 @@
 import { combineReducers } from "@reduxjs/toolkit";
 import authLoginSlice from "./auth/loginReducer";
 import authRegisterSlice from "./auth/registerReducer";
+import googleLoginSlice from "./auth/googleReducer";
 import popularSlice from "./movie/popularReducer";
 import detailSlice from "./movie/detailReducer";
 import searchSlice from "./movie/searchReducer";
@@ -12,5 +13,6 @@ export default combineReducers({
   detail: detailSlice,
   search: searchSlice,
   getme: meSlice,
-  register: authRegisterSlice
+  register: authRegisterSlice,
+  authGoogle: googleLoginSlice
 });
