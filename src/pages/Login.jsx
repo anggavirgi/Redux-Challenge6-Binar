@@ -5,9 +5,8 @@ import { useGoogleLogin } from "@react-oauth/google";
 import { useDataGoogle } from "../services/auth/GoogleAuth";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { CookieStorage, CookiesKeys } from "../utils/cookies";
 import { postLoginUser } from "../redux/actions/postLogin";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 export const Login = () => {
   const navigate = useNavigate();
@@ -26,7 +25,7 @@ export const Login = () => {
     )
       .then((result) => {
         if (result.status === 200) {
-          window.location.href = "/home"
+          window.location.href = "/home";
         }
       })
       .catch((err) => {
@@ -64,9 +63,9 @@ export const Login = () => {
     }
   }, [getErrMsg]);
 
-  const getToken = CookieStorage.get(CookiesKeys.RegisterToken);
+  const getRegisterToken = useSelector((state) => state.register.token);
   useEffect(() => {
-    if (getToken) {
+    if (getRegisterToken) {
       toast.success("Register Berhasil, Silahkan Login!", {
         position: "top-right",
         autoClose: 3500,
@@ -78,11 +77,7 @@ export const Login = () => {
         theme: "light",
       });
     }
-
-    setTimeout(() => {
-      CookieStorage.remove(CookiesKeys.RegisterToken);
-    }, 3600);
-  }, [getToken]);
+  }, [getRegisterToken]);
 
   return (
     <div className="w-[100vw] h-[100vh] imglogin bg-cover">

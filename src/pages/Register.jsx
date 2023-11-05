@@ -1,36 +1,40 @@
 import React, { useEffect, useState } from "react";
 import sideimage from "../assets/img/side-login.jpg";
 import { useNavigate } from "react-router-dom";
-import { useRegister } from "../services/auth/RegisterUser";
-import { CookieStorage, CookiesKeys } from "../utils/cookies";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useDispatch } from "react-redux";
+import { postRegisterUser } from "../redux/actions/postRegister";
 
 export const Register = () => {
   const navigate = useNavigate();
 
-  const token = CookieStorage.get(CookiesKeys.AuthToken);
-  if (token) {
-    window.location.href = "/home";
-  }
-
+  const dispatch = useDispatch()
+  
   const [getEmail, setEmail] = useState("");
   const [getUsername, setUsername] = useState("");
   const [getPassword, setPassword] = useState("");
-
-  const { mutate: postRegister, data: errMsg, status } = useRegister();
+  const [getErrMsg, setErrMsg] = useState("");
 
   const handleRegister = () => {
-    postRegister({
+    dispatch(postRegisterUser({
       email: getEmail,
       name: getUsername,
       password: getPassword,
+    })).then((result) => {
+      if (result.status === 201) {
+        navigate("/")
+      }
+    }).catch((err) => {
+      if (err.response.status === 400 || err.response.status === 401) {
+        setErrMsg(err.response.data.message);
+      }
     });
   };
 
   useEffect(() => {
-    if (errMsg) {
-      toast.error(errMsg, {
+    if (getErrMsg) {
+      toast.error(getErrMsg, {
         position: "top-right",
         autoClose: 3500,
         hideProgressBar: false,
@@ -41,7 +45,7 @@ export const Register = () => {
         theme: "light",
       });
     }
-  }, [status === "success"]);
+  }, [getErrMsg]);
 
   return (
     <div className="w-[100vw] h-[100vh] imglogin bg-cover">
