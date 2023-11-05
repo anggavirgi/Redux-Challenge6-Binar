@@ -1,17 +1,26 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useDataQuerySearch } from "../../services/GetSearch";
+import { useDispatch, useSelector } from "react-redux";
+import { getMovieSearch } from "../../redux/actions/getSearch";
 
 export const ListSearch = () => {
   const navigate = useNavigate();
   const dataSearch = useLocation();
+  const [getKeyword, setKeyword] = useState("");
 
-  const { data: fetchSearch, isSuccess } = useDataQuerySearch({
-    query: dataSearch.state.search,
-  });
+  if (dataSearch.state.search !== getKeyword) {
+    setKeyword(dataSearch.state.search);
+  }
 
-  const searchResult = fetchSearch?.data || [];
+  const dispatch = useDispatch();
+  const movieSearch = useSelector((state) => state.search.search);
 
+  useEffect(() => {
+    dispatch(getMovieSearch());
+    dispatch(getMovieSearch({ page: 1, query: getKeyword }));
+  }, [getKeyword]);
+
+  console.log(movieSearch);
   const detailPage = (id) => {
     navigate("/detail", {
       state: {
@@ -21,7 +30,7 @@ export const ListSearch = () => {
   };
 
   const renderSearch = () => {
-    return searchResult.map((value, index) => {
+    return movieSearch.search?.map((value, index) => {
       return (
         <div
           key={index}
@@ -59,7 +68,7 @@ export const ListSearch = () => {
 
   return (
     <div className="px-14 pt-6 bg-main text-white">
-      {isSuccess && searchResult.length === 0 ? (
+      {movieSearch.search?.length === 0 ? (
         <div className="font-bold text-3xl text-center">
           <div className="mb-3">KEYWORD : {dataSearch.state.search}</div>
           <div>== SEARCH NOT FOUND ==</div>

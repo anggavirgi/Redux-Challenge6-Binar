@@ -1,15 +1,25 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Input } from "../elements/Input";
 import { useNavigate } from "react-router-dom";
 import { CookieStorage, CookiesKeys } from "../../utils/cookies";
-import { useDataMe } from "../../services/GetMe";
 import ava from "../../assets/img/ava.jpg";
-import { useDispatch } from "react-redux";
-import { setLoggedIn, setToken} from "../../redux/reducers/auth/loginReducer";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  setLoggedIn,
+  setToken,
+  setUser,
+} from "../../redux/reducers/auth/loginReducer";
+import { getDataMe } from "../../redux/actions/getMe";
 
 export const Header = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
+  const { name, email } = useSelector((state) => state.getme);
+
+  useEffect(() => {
+    dispatch(getDataMe());
+  }, []);
 
   const handleSearch = (keyword) => {
     navigate("/search", {
@@ -19,18 +29,15 @@ export const Header = () => {
     });
   };
 
-  const { data: fetchMe, isSuccess } = useDataMe();
-  const dataMe = isSuccess ? fetchMe : {};
-
   const handleLogout = () => {
     CookieStorage.remove(CookiesKeys.AuthToken);
     window.location.href = "/";
   };
 
-  if(CookieStorage.get(CookiesKeys.AuthToken)){
-    dispatch(setToken(CookieStorage.get(CookiesKeys.AuthToken)))
+  if (CookieStorage.get(CookiesKeys.AuthToken)) {
+    dispatch(setToken(CookieStorage.get(CookiesKeys.AuthToken)));
     dispatch(setLoggedIn("true"));
-    // dispatch(setUser(input));
+    dispatch(setUser(email));
   }
 
   return (
@@ -66,7 +73,7 @@ export const Header = () => {
         </div>
         <div className="flex items-center gap-2 border border-secondary rounded-full pe-3">
           <img src={ava} alt="" className="w-8 h-8 rounded-full object-cover" />
-          <div className="text-secondary">{dataMe.name}</div>
+          <div className="text-secondary">{name}</div>
         </div>
         <button
           onClick={handleLogout}
